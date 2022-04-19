@@ -25,8 +25,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
 parser.add_argument('-name', type=str)
 parser.add_argument('--output_dir', type=str, default="/scratch/users/joecohen/output/")
-parser.add_argument('--dataset', type=str, default="pcrsna")
-parser.add_argument('--dataset_dir', type=str, default="/home/groups/akshaysc/joecohen/")
+parser.add_argument('--dataset', type=str, default="ct")
+parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
 parser.add_argument('--model', type=str, default="resnet50")
 parser.add_argument('--seed', type=int, default=0, help='')
 parser.add_argument('--cuda', type=bool, default=True, help='')
@@ -68,6 +68,12 @@ transforms = torchvision.transforms.Compose([xrv.datasets.XRayCenterCrop(),xrv.d
 
 datas = []
 datas_names = []
+if "ct" in cfg.dataset:
+    dataset = xrv.datasets.CT_Dataset(
+        imgpath = cfg.dataset_dir, 
+        transform=transforms, data_aug=data_aug, unique_patients=False)
+    datas.append(dataset)
+    datas_names.append("ct")
 if "nih" in cfg.dataset:
     dataset = xrv.datasets.NIH_Dataset(
         imgpath=cfg.dataset_dir + "/NIH/images-224", 
@@ -129,6 +135,8 @@ print("datas_names", datas_names)
 for d in datas:
     xrv.datasets.relabel_dataset(xrv.datasets.default_pathologies, d)
 
+print(f"Dataset labels: {datas[0].labels}")
+
 #cut out training sets
 train_datas = []
 test_datas = []
@@ -140,7 +148,7 @@ for i, dataset in enumerate(datas):
     test_dataset = xrv.datasets.SubsetDataset(dataset, test_inds)
     
     #disable data aug
-    test_dataset.data_aug = None
+    #test_dataset.data_aug = None #Louis commented this out
     
     train_datas.append(train_dataset)
     test_datas.append(test_dataset)

@@ -16,6 +16,16 @@ import skimage.transform
 from skimage.io import imread
 from torchvision import transforms
 
+def window_level(img1, level, window):
+    img = np.copy(img1)
+    upper = level + (window / 2)
+    lower = level - (window / 2)
+    img[img > upper] = upper
+    img[img < lower] = lower
+    img = (img - np.min(img)) / (np.max(img) - np.min(img))
+    return img
+
+
 default_pathologies = [
     'Atelectasis',
     'Consolidation',
@@ -654,6 +664,69 @@ class NIH_Google_Dataset(Dataset):
 
         if self.data_aug is not None:
             sample["img"] = self.data_aug(sample["img"])
+
+        return sample
+
+class CT_Dataset(Dataset):
+
+    def __init__(self,
+                 imgpath,
+                 transform = None,
+                 data_aug = None,
+                 seed=0,
+                 unique_patients = False
+    ):
+
+        super(CT_Dataset, self).__init__()
+        np.random.seed(seed)  # Reset the seed so all runs are the same.
+        self.imgpath = imgpath
+        meta = pd.read_csv(imgpath + 'opct-gifsplanation/data/multitask_multimodal_meta_v9.csv')
+        meta = meta.loc[meta.ihd_5yr < 2]
+        self.labels = np.array(meta.loc[:, 'ihd_5yr']).reshape((-1, 1))
+        self.csv = meta
+        self.csv.patientid = self.csv['mrn']
+        self.pathologies = ['Atelectasis']
+        self.transform = transform
+        self.data_aug = data_aug
+        print(self.csv)
+
+    def __len__(self):
+        return len(self.labels)
+
+    def string(self):
+        return self.__class__.__name__
+
+    def __getitem__(self, idx):
+
+        img_name1 = self.csv.iloc[idx] 
+        img_name = img_name1['fullname'] + '.h5'
+        fract = img_name1['pixdim3'] / img_name1['pixdim1']
+        img_h5 = h5py.File(os.path.join(self.data_location, img_name),'r')
+        img_cor = np.array(img_h5['coronal'])
+        img_cor = cv2.resize(img_cor, (img_cor.shape[1], int(img_cor.shape[0] * fract)), cv2.INTER_AREA)
+        img_cor = img_cor[0:512, :]
+        img_cor = np.pad(img_cor, ((0, 512 - img_cor.shape[0]), (0, 0)))
+        img_cor1 = window_level(img_cor, 50, 400)
+        img_cor1 = img_cor1.reshape((1, 512, 512))
+        img_cor2 = window_level(img_cor, 400, 1800)
+        img_cor2 = img_cor2.reshape((1, 512, 512))
+        img_cor3 = window_level(img_cor, 50, 500)
+        img_cor3 = img_cor3.reshape((1, 512, 512))
+        img_cor = np.concatenate([img_cor1, img_cor2, img_cor3], axis = 0)
+
+        sample = {}
+        sample["idx"] = idx
+        sample["lab"] = img_name1['ihd_5yr']
+        sample["img"] = img_cor
+
+        #get img
+        #sample["img"] = normalize(img, maxval=65535, reshape=True)
+
+        #if self.transform is not None:
+        #    sample["img"] = self.transform(sample["img"])
+
+        #if self.data_aug is not None:
+        #    sample["img"] = self.data_aug(sample["img"])
 
         return sample
 
