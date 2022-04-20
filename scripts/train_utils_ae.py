@@ -210,7 +210,7 @@ def valid_test_epoch(name, epoch, model, device, data_loader, criterion, limit=N
     avg_loss = []
     task_outputs={}
     task_targets={}
-    for task in range(data_loader.dataset[0]["lab"].shape[0]):
+    for task in range(1):
         task_outputs[task] = []
         task_targets[task] = []
         
@@ -225,7 +225,7 @@ def valid_test_epoch(name, epoch, model, device, data_loader, criterion, limit=N
             images = samples["img"].to(device)
             #targets = samples["lab"].to(device)
 
-            outputs = model(images)
+            outputs = model(images.float())
 
             #loss = torch.zeros(1).to(device).float()
             loss = (outputs["out"] - images)**2

@@ -15,6 +15,8 @@ import skimage
 import skimage.transform
 from skimage.io import imread
 from torchvision import transforms
+import h5py
+import cv2
 
 def window_level(img1, level, window):
     img = np.copy(img1)
@@ -684,10 +686,11 @@ class CT_Dataset(Dataset):
         meta = meta.loc[meta.ihd_5yr < 2]
         self.labels = np.array(meta.loc[:, 'ihd_5yr']).reshape((-1, 1))
         self.csv = meta
-        self.csv.patientid = self.csv['mrn']
+        self.csv['patientid'] = self.csv['mrn']
         self.pathologies = ['Atelectasis']
         self.transform = transform
         self.data_aug = data_aug
+        self.data_location = imgpath + 'opct-gifsplanation/data/axial_coronal_sagittal_h5/'
         print(self.csv)
 
     def __len__(self):
@@ -706,13 +709,14 @@ class CT_Dataset(Dataset):
         img_cor = cv2.resize(img_cor, (img_cor.shape[1], int(img_cor.shape[0] * fract)), cv2.INTER_AREA)
         img_cor = img_cor[0:512, :]
         img_cor = np.pad(img_cor, ((0, 512 - img_cor.shape[0]), (0, 0)))
-        img_cor1 = window_level(img_cor, 50, 400)
-        img_cor1 = img_cor1.reshape((1, 512, 512))
+        #img_cor1 = window_level(img_cor, 50, 400)
+        #img_cor1 = img_cor1.reshape((1, 512, 512))
         img_cor2 = window_level(img_cor, 400, 1800)
         img_cor2 = img_cor2.reshape((1, 512, 512))
-        img_cor3 = window_level(img_cor, 50, 500)
-        img_cor3 = img_cor3.reshape((1, 512, 512))
-        img_cor = np.concatenate([img_cor1, img_cor2, img_cor3], axis = 0)
+        #img_cor3 = window_level(img_cor, 50, 500)
+        #img_cor3 = img_cor3.reshape((1, 512, 512))
+        #img_cor = np.concatenate([img_cor1, img_cor2, img_cor3], axis = 0)
+        img_cor = img_cor2
 
         sample = {}
         sample["idx"] = idx

@@ -23,14 +23,14 @@ import torchxrayvision as xrv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
-parser.add_argument('-name', type=str)
-parser.add_argument('--output_dir', type=str, default="/scratch/users/joecohen/output/")
+parser.add_argument('-name', type=str, default = "ct")
+parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output/")
 parser.add_argument('--dataset', type=str, default="ct")
 parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
 parser.add_argument('--model', type=str, default="ResNetAE50")
 parser.add_argument('--seed', type=int, default=0, help='')
 parser.add_argument('--cuda', type=bool, default=True, help='')
-parser.add_argument('--num_epochs', type=int, default=1000, help='')
+parser.add_argument('--num_epochs', type=int, default=20, help='')
 parser.add_argument('--batch_size', type=int, default=32, help='')
 parser.add_argument('--shuffle', type=bool, default=True, help='')
 parser.add_argument('--lr', type=float, default=0.0001, help='')
@@ -46,7 +46,7 @@ parser.add_argument('--label_concat', type=bool, default=False, help='')
 parser.add_argument('--label_concat_reg', type=bool, default=False, help='')
 parser.add_argument('--graphmask', type=bool, default=False, help='')
 parser.add_argument('--limit', type=int, default=15000, help='')
-parser.add_argument('--multicuda', type=bool, default=True, help='')
+parser.add_argument('--multicuda', type=bool, default=False, help='')
 parser.add_argument('--elastic', type=bool, default=False, help='')
 
 cfg = parser.parse_args()
@@ -195,9 +195,8 @@ if cfg.model == "resnet50-2":
                                               xrv.models_ae.DeconvBottleneck, 
                                               [3, 4, 6, 3], 1)
 if cfg.model == "ResNetAE50":
-    model = xrv.autoencoders.ResNetAE50(xrv.autoencoders.Bottleneck, 
-                                              xrv.autoencoders.DeconvBottleneck, 
-                                              [3, 4, 6, 3], 1)
+    model = xrv.autoencoders.ResNetAE50()
+
 if cfg.model == "resnet101-2":
     model  = xrv.models_ae.ResNet_autoencoder2(xrv.models_ae.Bottleneck, 
                                                xrv.models_ae.DeconvBottleneck, 
