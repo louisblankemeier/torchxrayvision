@@ -24,13 +24,13 @@ import torchxrayvision as xrv
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
 parser.add_argument('-name', type=str, default = "ct")
-parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_sig/")
+parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_v1/")
 parser.add_argument('--dataset', type=str, default="ct")
 parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
 parser.add_argument('--model', type=str, default="ResNetAE50")
 parser.add_argument('--seed', type=int, default=0, help='')
 parser.add_argument('--cuda', type=bool, default=True, help='')
-parser.add_argument('--num_epochs', type=int, default=20, help='')
+parser.add_argument('--num_epochs', type=int, default=1000, help='')
 parser.add_argument('--batch_size', type=int, default=32, help='')
 parser.add_argument('--shuffle', type=bool, default=True, help='')
 parser.add_argument('--lr', type=float, default=0.0001, help='')
@@ -196,6 +196,9 @@ if cfg.model == "resnet50-2":
                                               [3, 4, 6, 3], 1)
 if cfg.model == "ResNetAE50":
     model = xrv.autoencoders.ResNetAE50()
+
+if cfg.model == "ResNetAE101":
+    model = xrv.autoencoders.ResNetAE101()
 
 if cfg.model == "resnet101-2":
     model  = xrv.models_ae.ResNet_autoencoder2(xrv.models_ae.Bottleneck, 

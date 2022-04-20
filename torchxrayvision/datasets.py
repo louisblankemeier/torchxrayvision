@@ -24,7 +24,7 @@ def window_level(img1, level, window):
     lower = level - (window / 2)
     img[img > upper] = upper
     img[img < lower] = lower
-    img = (img - np.min(img)) / (np.max(img) - np.min(img))
+    #img = (img - np.min(img)) / (np.max(img) - np.min(img))
     return img
 
 
@@ -721,16 +721,15 @@ class CT_Dataset(Dataset):
         sample = {}
         sample["idx"] = idx
         sample["lab"] = img_name1['ihd_5yr']
-        sample["img"] = img_cor
+        img = img_cor
 
-        #get img
-        #sample["img"] = normalize(img, maxval=65535, reshape=True)
+        sample["img"] = normalize(img, maxval=1300, reshape=False)
 
-        #if self.transform is not None:
-        #    sample["img"] = self.transform(sample["img"])
+        if self.transform is not None:
+            sample["img"] = self.transform(sample["img"])
 
-        #if self.data_aug is not None:
-        #    sample["img"] = self.data_aug(sample["img"])
+        if self.data_aug is not None:
+            sample["img"] = self.data_aug(sample["img"])
 
         return sample
 
