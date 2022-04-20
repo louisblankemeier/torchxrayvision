@@ -728,8 +728,8 @@ class CT_Dataset(Dataset):
         if self.transform is not None:
             sample["img"] = self.transform(sample["img"])
 
-        if self.data_aug is not None:
-            sample["img"] = self.data_aug(sample["img"])
+        #if self.data_aug is not None:
+        #    sample["img"] = self.data_aug(sample["img"])
 
         return sample
 

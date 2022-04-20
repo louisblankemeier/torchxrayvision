@@ -21,8 +21,6 @@ def tqdm(*args, **kwargs):
 #from tqdm.auto import tqdm
 
 
-
-
 def train(model, dataset, cfg):
     print("Our config:")
     pprint.pprint(cfg)
@@ -165,8 +163,6 @@ def train(model, dataset, cfg):
             torch.save(model_tosave, join(cfg.output_dir, f'{dataset_name}-model{epoch + 1}.pt'))
 
     return metrics, best_metric, weights_for_best_validauc
-
-
 
 
 
