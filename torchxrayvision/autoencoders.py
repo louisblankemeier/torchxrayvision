@@ -194,6 +194,7 @@ class _ResNetAE(nn.Module):
         x = self.uplayer_top(x)
 
         x = self.conv1_1(x, output_size=image_size)
+        x = nn.Sigmoid()(x)
         return x
     
     def forward(self, x):

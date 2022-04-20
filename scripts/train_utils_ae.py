@@ -157,11 +157,12 @@ def train(model, dataset, cfg):
         model_tosave = model
         if isinstance(model, torch.nn.DataParallel):
             model_tosave = model.module
-        torch.save({'epoch': epoch,
-                    'model_state_dict': model_tosave.state_dict(),
-                    'optimizer_state_dict': optim.state_dict(),
-                    }, join(cfg.output_dir, f'{dataset_name}-e{epoch + 1}.pt'))
-        torch.save(model_tosave, join(cfg.output_dir, f'{dataset_name}-model{epoch + 1}.pt'))
+        if epoch % 10 == 0:
+            torch.save({'epoch': epoch,
+                        'model_state_dict': model_tosave.state_dict(),
+                        'optimizer_state_dict': optim.state_dict(),
+                        }, join(cfg.output_dir, f'{dataset_name}-e{epoch + 1}.pt'))
+            torch.save(model_tosave, join(cfg.output_dir, f'{dataset_name}-model{epoch + 1}.pt'))
 
     return metrics, best_metric, weights_for_best_validauc
 

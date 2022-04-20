@@ -24,7 +24,7 @@ import torchxrayvision as xrv
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
 parser.add_argument('-name', type=str, default = "ct")
-parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output/")
+parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_sig/")
 parser.add_argument('--dataset', type=str, default="ct")
 parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
 parser.add_argument('--model', type=str, default="ResNetAE50")
