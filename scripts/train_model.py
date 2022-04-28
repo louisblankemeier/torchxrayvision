@@ -23,15 +23,15 @@ import torchxrayvision as xrv
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
-parser.add_argument('-name', type=str)
-parser.add_argument('--output_dir', type=str, default="/scratch/users/joecohen/output/")
+parser.add_argument('-name', type=str, default="ct")
+parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_classifier")
 parser.add_argument('--dataset', type=str, default="ct")
-parser.add_argument('--dataset_dir', type=str, default="/home/groups/akshaysc/joecohen/")
+parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
 parser.add_argument('--model', type=str, default="resnet50")
 parser.add_argument('--seed', type=int, default=0, help='')
 parser.add_argument('--cuda', type=bool, default=True, help='')
 parser.add_argument('--num_epochs', type=int, default=400, help='')
-parser.add_argument('--batch_size', type=int, default=64, help='')
+parser.add_argument('--batch_size', type=int, default=16, help='')
 parser.add_argument('--shuffle', type=bool, default=True, help='')
 parser.add_argument('--lr', type=float, default=0.001, help='')
 parser.add_argument('--threads', type=int, default=4, help='')
@@ -64,6 +64,12 @@ transforms = torchvision.transforms.Compose([xrv.datasets.XRayCenterCrop(),xrv.d
 
 datas = []
 datas_names = []
+if "ct" in cfg.dataset:
+    dataset = xrv.datasets.CT_Dataset(
+        imgpath = cfg.dataset_dir, 
+        transform=transforms, data_aug=data_aug, unique_patients=False)
+    datas.append(dataset)
+    datas_names.append("ct")
 if "nih" in cfg.dataset:
     dataset = xrv.datasets.NIH_Dataset(
         imgpath=cfg.dataset_dir + "/images-512-NIH", 
@@ -155,7 +161,7 @@ for i, dataset in enumerate(datas):
     test_dataset = xrv.datasets.SubsetDataset(dataset, test_inds)
     
     #disable data augs
-    test_dataset.data_aug = None
+    #test_dataset.data_aug = None
     
     train_datas.append(train_dataset)
     test_datas.append(test_dataset)
@@ -195,6 +201,8 @@ elif "resnet101" in cfg.model:
     model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
     
 elif "resnet50" in cfg.model:
+    print("NUM CLASSES:")
+    print(train_dataset.labels.shape[1])
     model = torchvision.models.resnet50(num_classes=train_dataset.labels.shape[1], pretrained=False)
     #patch for single channel
     model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)

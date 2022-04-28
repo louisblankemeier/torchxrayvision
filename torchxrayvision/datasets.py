@@ -24,29 +24,29 @@ def window_level(img1, level, window):
     lower = level - (window / 2)
     img[img > upper] = upper
     img[img < lower] = lower
-    #img = (img - np.min(img)) / (np.max(img) - np.min(img))
+    img = (img - np.min(img)) / (np.max(img) - np.min(img))
     return img
 
 
 default_pathologies = [
     'Atelectasis',
-    'Consolidation',
-    'Infiltration',
-    'Pneumothorax',
-    'Edema',
-    'Emphysema',
-    'Fibrosis',
-    'Effusion',
-    'Pneumonia',
-    'Pleural_Thickening',
-    'Cardiomegaly',
-    'Nodule',
-    'Mass',
-    'Hernia',
-    'Lung Lesion',
-    'Fracture',
-    'Lung Opacity',
-    'Enlarged Cardiomediastinum'
+    #'Consolidation',
+    #'Infiltration',
+    #'Pneumothorax',
+    #'Edema',
+    #'Emphysema',
+    #'Fibrosis',
+    #'Effusion',
+    #'Pneumonia',
+    #'Pleural_Thickening',
+    #'Cardiomegaly',
+    #'Nodule',
+    #'Mass',
+    #'Hernia',
+    #'Lung Lesion',
+    #'Fracture',
+    #'Lung Opacity',
+    #'Enlarged Cardiomediastinum'
 ]
 
 thispath = os.path.dirname(os.path.realpath(__file__))
@@ -705,13 +705,14 @@ class CT_Dataset(Dataset):
         img_name = img_name1['fullname'] + '.h5'
         fract = img_name1['pixdim3'] / img_name1['pixdim1']
         img_h5 = h5py.File(os.path.join(self.data_location, img_name),'r')
-        img_cor = np.array(img_h5['coronal'])
-        img_cor = cv2.resize(img_cor, (img_cor.shape[1], int(img_cor.shape[0] * fract)), cv2.INTER_AREA)
-        img_cor = img_cor[0:512, :]
-        img_cor = np.pad(img_cor, ((0, 512 - img_cor.shape[0]), (0, 0)))
+        img_cor = np.array(img_h5['axial'])
+        #img_cor = cv2.resize(img_cor, (img_cor.shape[1], int(img_cor.shape[0] * fract)), cv2.INTER_AREA)
+        #img_cor = img_cor[0:512, :]
+        #img_cor = np.pad(img_cor, ((0, 512 - img_cor.shape[0]), (0, 0)))
         #img_cor1 = window_level(img_cor, 50, 400)
         #img_cor1 = img_cor1.reshape((1, 512, 512))
-        img_cor2 = window_level(img_cor, 400, 1800)
+        img_cor2 = window_level(img_cor, 50, 400)
+        #print("hiiiiiiiii")
         img_cor2 = img_cor2.reshape((1, 512, 512))
         #img_cor3 = window_level(img_cor, 50, 500)
         #img_cor3 = img_cor3.reshape((1, 512, 512))
@@ -721,12 +722,13 @@ class CT_Dataset(Dataset):
         sample = {}
         sample["idx"] = idx
         sample["lab"] = img_name1['ihd_5yr']
-        img = img_cor
+        #img = img_cor
+        sample["img"] = img_cor
 
-        sample["img"] = normalize(img, maxval=1300, reshape=False)
+        #sample["img"] = normalize(img, maxval=1300, reshape=False)
 
-        if self.transform is not None:
-            sample["img"] = self.transform(sample["img"])
+        #if self.transform is not None:
+        #    sample["img"] = self.transform(sample["img"])
 
         #if self.data_aug is not None:
         #    sample["img"] = self.data_aug(sample["img"])

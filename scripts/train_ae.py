@@ -24,10 +24,10 @@ import torchxrayvision as xrv
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, default="", help='')
 parser.add_argument('-name', type=str, default = "ct")
-parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_elastic/")
+parser.add_argument('--output_dir', type=str, default="/dataNAS/people/lblankem/torchxrayvision/output_simple_l3/")
 parser.add_argument('--dataset', type=str, default="ct")
 parser.add_argument('--dataset_dir', type=str, default="/dataNAS/people/lblankem/")
-parser.add_argument('--model', type=str, default="ResNetAE50")
+parser.add_argument('--model', type=str, default="SimpleAE")
 parser.add_argument('--seed', type=int, default=0, help='')
 parser.add_argument('--cuda', type=bool, default=True, help='')
 parser.add_argument('--num_epochs', type=int, default=1000, help='')
@@ -194,6 +194,12 @@ if cfg.model == "resnet50-2":
     model  = xrv.models_ae.ResNet_autoencoder2(xrv.models_ae.Bottleneck, 
                                               xrv.models_ae.DeconvBottleneck, 
                                               [3, 4, 6, 3], 1)
+if cfg.model == "DFCVAE":
+    model = xrv.autoencoders.DFCVAE(in_channels = 1, latent_dim = 2000)
+
+if cfg.model == "SimpleAE":
+    model = xrv.autoencoders.SimpleAE(in_channels = 1, latent_dim = 2000)
+
 if cfg.model == "ResNetAE50":
     model = xrv.autoencoders.ResNetAE50()
 

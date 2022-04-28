@@ -171,12 +171,17 @@ def train_epoch(cfg, epoch, model, device, train_loader, optimizer, criterion, l
         outputs = model(images)
         
         loss = torch.zeros(1).to(device).float()
-        for task in range(targets.shape[1]):
-            task_output = outputs[:,task]
-            task_target = targets[:,task]
+        for task in range(1):
+            #task_output = outputs[:,task]
+            #task_target = targets[:,task]
+            task_output = outputs
+            task_target = targets
             mask = ~torch.isnan(task_target)
+            #print(task_output)
+            #print(task_target)
+            #print(mask)
             task_output = task_output[mask]
-            task_target = task_target[mask]
+            task_target = task_target[mask].reshape((-1, 1))
             if len(task_target) > 0:
                 task_loss = criterion(task_output.float(), task_target.float())
                 if cfg.taskweights:
@@ -221,7 +226,7 @@ def valid_test_epoch(name, epoch, model, device, data_loader, criterion, limit=N
     avg_loss = []
     task_outputs={}
     task_targets={}
-    for task in range(data_loader.dataset[0]["lab"].shape[0]):
+    for task in range(1):
         task_outputs[task] = []
         task_targets[task] = []
         
@@ -233,18 +238,18 @@ def valid_test_epoch(name, epoch, model, device, data_loader, criterion, limit=N
                 print("breaking out")
                 break
             
-            images = samples["img"].to(device)
+            images = samples["img"].to(device).float()
             targets = samples["lab"].to(device)
 
             outputs = model(images)
             
             loss = torch.zeros(1).to(device).double()
-            for task in range(targets.shape[1]):
-                task_output = outputs[:,task]
-                task_target = targets[:,task]
+            for task in range(1):
+                task_output = outputs
+                task_target = targets
                 mask = ~torch.isnan(task_target)
                 task_output = task_output[mask]
-                task_target = task_target[mask]
+                task_target = task_target[mask].reshape((-1, 1))
                 if len(task_target) > 0:
                     loss += criterion(task_output.double(), task_target.double())
                 
